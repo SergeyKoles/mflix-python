@@ -146,10 +146,7 @@ def get_movies_faceted(filters, page, movies_per_page):
     The pipeline is a Python array, so you can use append() or extend() to
     complete this task.
     """
-
-    # TODO: Faceted Search
-    # Add the necessary stages to the pipeline variable in the correct order.
-    # pipeline.extend(...)
+    pipeline.extend([skip_stage, limit_stage, facet_stage])
 
     try:
         movies = list(db.movies.aggregate(pipeline, allowDiskUse=True))[0]
