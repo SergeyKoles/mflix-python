@@ -453,21 +453,17 @@ def most_active_commenters():
     """
     Returns a list of the top 20 most frequent commenters.
     """
+    group_stage = {'$group': {'_id': '$email',
+                              'count': {'$sum': 1}}}
+    sort_stage = {'$sort': {'count': DESCENDING}}
+    limit_stage = {'$limit': 20}
+    pipeline = [group_stage,
+                sort_stage,
+                limit_stage]
 
-    """
-    Ticket: User Report
-
-    Construct a pipeline to find the users who comment the most on MFlix, sort
-    by the number of comments, and then only return the 20 documents with the
-    highest values.
-
-    No field projection necessary.
-    """
-    # TODO: User Report
-    # Return the 20 users who have commented the most on MFlix.
-    pipeline = []
-
-    rc = db.comments.read_concern # you may want to change this read concern!
+    # we used Read Concern "majority" to make sure the data we read has been
+    # majority-committed
+    rc = ReadConcern("majority")
     comments = db.comments.with_options(read_concern=rc)
     result = comments.aggregate(pipeline)
     return list(result)
