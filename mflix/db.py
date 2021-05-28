@@ -229,33 +229,35 @@ def get_movies(filters, page, movies_per_page):
 
 
 def get_movie(id):
-    """
-    Given a movie ID, return a movie with that ID, with the comments for that
-    movie embedded in the movie document. The comments are joined from the
-    comments collection using expressive $lookup.
-    """
     try:
-
-        """
-        Ticket: Get Comments
-
-        Please implement a $lookup stage in this pipeline to find all the
-        comments for the given movie. The movie_id in the `comments` collection
-        can be used to refer to the _id from the `movies` collection.
-
-        Embed the joined comments in a new field called "comments".
-        """
-
-        # TODO: Get Comments
-        # Implement the required pipeline.
+        # here's the pipeline used to join comments
         pipeline = [
             {
+                # find the current movie in the "movies" collection
                 "$match": {
                     "_id": ObjectId(id)
                 }
+            },
+            {
+                "$lookup": {
+                    "from": "comments",
+                    "let": {"id": "$_id"},
+                    "pipeline": [
+                        # only join comments with matching movie_id
+                        {
+                            "$match": {
+                                "$expr": {"$eq": ["$movie_id", "$$id"]}}
+                        },
+                        # sort comments in descending order by date
+                        {
+                            "$sort": {"date": -1}
+                        }
+                    ],
+                    # call embedded field comments
+                    "as": "comments"
+                }
             }
         ]
-
         movie = db.movies.aggregate(pipeline).next()
         return movie
 
