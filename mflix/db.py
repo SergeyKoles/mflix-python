@@ -44,11 +44,11 @@ def get_db():
         """
 
         db = g._database = MongoClient(
-        MFLIX_DB_URI,
-        # TODO: Connection Pooling
-        # Set the maximum connection pool size to 50 active connections.
-        # TODO: Timeouts
-        # Set the write timeout limit to 2500 milliseconds.
+            MFLIX_DB_URI,
+            # here's where we set the maximum connection pool size to 50 connections
+            maxPoolSize=50
+            # TODO: Timeouts
+            # Set the write timeout limit to 2500 milliseconds.
         )[MFLIX_DB_NAME]
     return db
 
